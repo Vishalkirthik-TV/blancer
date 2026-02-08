@@ -98,6 +98,7 @@ function sendPersistentMenu(ctx, role) {
     } else {
         buttons = [
             [Markup.button.callback('📩 Send Message', 'main_menu_dm'), Markup.button.callback('📞 Request Call', 'main_menu_call')],
+            [Markup.button.callback('📜 Download Contract', 'main_menu_download_contract')],
             [Markup.button.callback('📹 Video Call', 'main_menu_video'), Markup.button.callback('📤 Submit Work', 'main_menu_submit')],
             [Markup.button.callback('📊 Project Status', 'main_menu_status'), Markup.button.callback('🤖 AI Summary', 'main_menu_ai_summary')]
         ];

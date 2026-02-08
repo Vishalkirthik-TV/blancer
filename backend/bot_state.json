@@ -1,5 +1,67 @@
 {
-  "chatStates": {},
-  "projectStore": {},
-  "usernameMap": {}
+  "chatStates": {
+    "1644556303": {
+      "step": "WORKING",
+      "client": 6732245065,
+      "clientUsername": "sarangkdkr",
+      "freelancer": 1644556303,
+      "freelancerUsername": "Vishalkirthik",
+      "project": {
+        "scope": "Build UI for frontend",
+        "budget": 12,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime"
+      },
+      "projectId": 1770553297871,
+      "role": "freelancer",
+      "escrowId": "7"
+    },
+    "6732245065": {
+      "step": "WORKING",
+      "project": {
+        "scope": "Build UI for frontend",
+        "budget": 12,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime"
+      },
+      "client": 6732245065,
+      "freelancer": 1644556303,
+      "missingField": null,
+      "history": null,
+      "role": "client",
+      "username": "sarangkdkr",
+      "tempProjectId": 1770553290002,
+      "projectId": 1770553297871,
+      "freelancerUsername": "Vishalkirthik",
+      "paymentMethod": "upi",
+      "transakOrderId": "ESC_1770553297871_1770553311504",
+      "escrowId": "7",
+      "agreementHash": "0x3f96aec9f9ffce454b106e6c36e2a321c1324c514b4808764fe171cafe56507d",
+      "paymentVerified": true
+    }
+  },
+  "projectStore": {
+    "1770553297871": {
+      "clientId": 6732245065,
+      "clientChatId": 6732245065,
+      "project": {
+        "scope": "Build UI for frontend",
+        "budget": 12,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime"
+      },
+      "status": "accepted",
+      "freelancerId": 1644556303
+    }
+  },
+  "usernameMap": {
+    "sarangkdkr": 6732245065,
+    "vishalkirthik": 1644556303
+  }
 }

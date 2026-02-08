@@ -48,11 +48,15 @@ let contract = null;
 
 function initBlockchain() {
     if (!MOCK_MODE && !provider) {
-        provider = new ethers.JsonRpcProvider(RPC_URL, {
-            chainId: CHAIN_ID,
-            name: "monad-testnet"
+        // Use static network to prevent excessive eth_chainId calls (rate limit fix)
+        // Explicitly defining the network avoids auto-detection
+        const network = new ethers.Network("monad-testnet", CHAIN_ID);
+
+        provider = new ethers.JsonRpcProvider(RPC_URL, network, {
+            staticNetwork: network
         });
-        provider.pollingInterval = 10000; // Slow down polling to avoid rate limits (25 req/sec limit)
+
+        provider.pollingInterval = 15000; // Increased to 15s to be safe
         wallet = new ethers.Wallet(PRIVATE_KEY, provider);
         contract = new ethers.Contract(CONTRACT_ADDRESS, ESCROW_ABI, wallet);
         console.log("🔗 Blockchain connection initialized");

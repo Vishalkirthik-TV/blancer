@@ -40,7 +40,7 @@ async function refreshAccessToken() {
                 widgetParams: {
                     apiKey: TRANSAK_API_KEY,
                     referrerDomain: "zent.escrow",
-                    cryptoCurrencyCode: "USDT",
+                    cryptoCurrencyCode: "MON",
                     fiatCurrency: "INR"
                 }
             },
@@ -93,10 +93,10 @@ function generatePaymentUrl(amountINR, walletAddress, orderId) {
         fiatCurrency: 'INR',
         fiatAmount: amountINR.toString(),
 
-        // Crypto settings - using USDT on a supported network
+        // Crypto settings - using MON on Monad Testnet for demo
         // Note: Monad not directly supported, so we use bridgeable tokens
-        cryptoCurrencyCode: 'USDT',
-        network: 'polygon', // Use Polygon USDT, then bridge if needed
+        cryptoCurrencyCode: 'MON',
+        // network: 'monad', // If supported by Transak in future
 
         // Wallet address (escrow wallet)
         walletAddress: walletAddress,
