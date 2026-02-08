@@ -39,7 +39,7 @@ async function refreshAccessToken() {
             {
                 widgetParams: {
                     apiKey: TRANSAK_API_KEY,
-                    referrerDomain: "blancer.escrow",
+                    referrerDomain: "zent.escrow",
                     cryptoCurrencyCode: "USDT",
                     fiatCurrency: "INR"
                 }

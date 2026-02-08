@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors'); // Added CORS
+const { generateContractPDF } = require('./pdf_service');
+const PDFDocument = require('pdfkit');
 const { processProjectConversation, generateProjectSummary } = require('./ai_service');
 const { fundEscrow, releaseFunds, raiseDispute } = require('./escrow_service');
 const { logEvent, generateProof } = require('./timeline_service');
@@ -101,7 +103,7 @@ function sendPersistentMenu(ctx, role) {
         ];
     }
 
-    return ctx.reply("🛠️ **Project Menu**\nSelect an action:", Markup.inlineKeyboard(buttons));
+    return ctx.reply("🛠️ *Project Menu*\nSelect an action:", { parse_mode: 'Markdown', ...Markup.inlineKeyboard(buttons) });
 }
 
 
@@ -181,36 +183,45 @@ bot.start(async (ctx) => {
                 : (state.clientUsername || "your client");
 
             return ctx.reply(
-                `🚫 **Active Project in Progress**\n\n` +
+                `🚫 *Active Project in Progress*\n\n` +
                 `You are currently working with @${counterparty}.\n` +
                 `You cannot switch roles or leave the project until it is completed/cancelled.`,
-                Markup.inlineKeyboard([
-                    [Markup.button.callback('➡️ Continue Project', 'resume_session')]
-                ])
+                {
+                    parse_mode: 'Markdown',
+                    ...Markup.inlineKeyboard([
+                        [Markup.button.callback('➡️ Continue Project', 'resume_session')]
+                    ])
+                }
             );
         }
 
         // Check for active session (not IDLE or Locked)
         if (state && state.step !== STEPS.IDLE) {
             return ctx.reply(
-                `⚠️ **Active Session Detected**\n\n` +
-                `You are currently in **${state.step}** mode.\n` +
+                `⚠️ *Active Session Detected*\n\n` +
+                `You are currently in *${state.step}* mode.\n` +
                 `Do you want to continue or start over?`,
-                Markup.inlineKeyboard([
-                    [Markup.button.callback('➡️ Continue Session', 'resume_session')],
-                    [Markup.button.callback('🔄 Start New / Change Role', 'reset_session')]
-                ])
+                {
+                    parse_mode: 'Markdown',
+                    ...Markup.inlineKeyboard([
+                        [Markup.button.callback('➡️ Continue Session', 'resume_session'),
+                        Markup.button.callback('🔄 Start New / Change Role', 'reset_session')]
+                    ])
+                }
             );
         }
 
         // Default start: Ask for role
         ctx.reply(
-            "👋 Welcome to Blancer Escrow!\n\n" +
-            "Are you looking to **HIRE** or **WORK**?",
-            Markup.inlineKeyboard([
-                [Markup.button.callback('👨‍💼 I am a Client (Hire)', 'role_client')],
-                [Markup.button.callback('👨‍💻 I am a Freelancer (Work)', 'role_freelancer')]
-            ])
+            "👋 Welcome to ZENT Escrow!\n\n" +
+            "Are you looking to *HIRE* or *WORK*?",
+            {
+                parse_mode: 'Markdown',
+                ...Markup.inlineKeyboard([
+                    [Markup.button.callback('👨‍💼 I am a Client (Hire)', 'role_client')],
+                    [Markup.button.callback('👨‍💻 I am a Freelancer (Work)', 'role_freelancer')]
+                ])
+            }
         );
     }
     console.log("=== END START HANDLER ===\n");
@@ -604,12 +615,15 @@ bot.on('message', async (ctx) => {
         if (state.client) {
             bot.telegram.sendMessage(
                 state.client,
-                `ℹ️ **Freelancer chose Crypto Payout**\n\n` +
+                `ℹ️ *Freelancer chose Crypto Payout*\n\n` +
                 `Wallet: \`${address}\`\n\n` +
                 `Please confirm the release.`,
-                Markup.inlineKeyboard([
-                    [Markup.button.callback('✅ Confirm Release', 'confirm_release')]
-                ])
+                {
+                    parse_mode: 'Markdown',
+                    ...Markup.inlineKeyboard([
+                        [Markup.button.callback('✅ Confirm Release', 'confirm_release')]
+                    ])
+                }
             );
             if (chatStates[state.client]) chatStates[state.client].step = STEPS.CONFIRM_RELEASE;
         }
@@ -1008,11 +1022,11 @@ bot.action('fund_escrow', async (ctx) => {
             }
 
             const freelancerMsg =
-                `🚀 Project Started!\n\n` +
+                `🚀 *Project Started!*\n\n` +
                 `Client funded ₹${state.project.budget}.\n` +
-                (isMilestone ? `**Milestones:**\n${milestoneText}\n` : `**One-Time Payment**\n`) +
+                (isMilestone ? `*Milestones:*\n${milestoneText}\n` : `*One-Time Payment*\n`) +
                 `You can start working.`;
-            bot.telegram.sendMessage(state.freelancer, freelancerMsg);
+            bot.telegram.sendMessage(state.freelancer, freelancerMsg, { parse_mode: 'Markdown' });
         } else {
             ctx.reply("Funding failed.");
         }
@@ -1046,9 +1060,10 @@ bot.action('approve_work', async (ctx) => {
     state.pendingReleaseAmount = releaseAmount;
 
     ctx.editMessageText(
-        `✅ **Work Approved!**\n\n` +
+        `✅ *Work Approved!*\n\n` +
         `We are now waiting for the freelancer to choose their payout method (INR or Crypto).\n` +
-        `You will be asked to confirm the final release shortly.`
+        `You will be asked to confirm the final release shortly.`,
+        { parse_mode: 'Markdown' }
     );
 
     // Notify Freelancer
@@ -1061,13 +1076,16 @@ bot.action('approve_work', async (ctx) => {
 
         bot.telegram.sendMessage(
             state.freelancer,
-            `🎉 **Work Approved!**\n\n` +
+            `🎉 *Work Approved!*\n\n` +
             `The client has approved the work. Funds (₹${releaseAmount}) are ready to be released.\n\n` +
             `How would you like to receive the payment?`,
-            Markup.inlineKeyboard([
-                [Markup.button.callback('🇮🇳 Receive in Local Currency (INR)', 'payout_method_inr')],
-                [Markup.button.callback('🔗 Receive in Crypto (Monad)', 'payout_method_crypto')]
-            ])
+            {
+                parse_mode: 'Markdown',
+                ...Markup.inlineKeyboard([
+                    [Markup.button.callback('🇮🇳 Receive in Local Currency (INR)', 'payout_method_inr')],
+                    [Markup.button.callback('🔗 Receive in Crypto (Monad)', 'payout_method_crypto')]
+                ])
+            }
         );
     }
 });
@@ -1083,22 +1101,26 @@ bot.action('payout_method_inr', (ctx) => {
     state.payoutAddress = "0x000000000000000000000000000000000000dead"; // Valid mock address
 
     ctx.editMessageText(
-        `✅ You selected **Local Currency (INR)**.\n\n` +
+        `✅ You selected *Local Currency (INR)*.\n\n` +
         `The client has been notified to confirm the release.\n` +
-        `Funds will be converted and transferred to your bank account.`
+        `Funds will be converted and transferred to your bank account.`,
+        { parse_mode: 'Markdown' }
     );
 
     // Notify Client to Confirm
     if (state.client) {
         bot.telegram.sendMessage(
             state.client,
-            `ℹ️ **Freelancer chose INR Payout**\n\n` +
-            `They have selected to receive funds in their local currency via **Transak Off-Ramp**.\n` +
+            `ℹ️ *Freelancer chose INR Payout*\n\n` +
+            `They have selected to receive funds in their local currency via *Transak Off-Ramp*.\n` +
             `The funds will be sent to the Off-Ramp smart contract to process the fiat conversion.\n\n` +
             `Please confirm the release.`,
-            Markup.inlineKeyboard([
-                [Markup.button.callback('✅ Confirm Release (Transak Off-Ramp)', 'confirm_release')]
-            ])
+            {
+                parse_mode: 'Markdown',
+                ...Markup.inlineKeyboard([
+                    [Markup.button.callback('✅ Confirm Release (Transak Off-Ramp)', 'confirm_release')]
+                ])
+            }
         );
         if (chatStates[state.client]) chatStates[state.client].step = STEPS.CONFIRM_RELEASE;
     }
@@ -1114,8 +1136,9 @@ bot.action('payout_method_crypto', (ctx) => {
     state.step = STEPS.WAITING_PAYOUT_ADDRESS;
 
     ctx.editMessageText(
-        `🔗 **You selected Crypto (Monad)**\n\n` +
-        `Please reply with your **Monad Wallet Address** (starts with 0x...).`
+        `🔗 *You selected Crypto (Monad)*\n\n` +
+        `Please reply with your *Monad Wallet Address* (starts with 0x...).`,
+        { parse_mode: 'Markdown' }
     );
 });
 
@@ -1161,11 +1184,11 @@ bot.action('confirm_release', async (ctx) => {
             let freelancerMsg = "";
 
             if (payoutMethod === 'inr') {
-                clientMsg = `✅ **Payment Released via Transak**\nFunds sent to Off-Ramp for INR conversion.\nRef: \`${result.hash?.substring(0, 10)}...\`\n\nThe freelancer will receive the fiat amount shortly.`;
-                freelancerMsg = `✅ **Payment Released!**\nClient has released the funds to **Transak Off-Ramp**.\nYour INR transfer is being processed.\nRef: \`${result.hash?.substring(0, 10)}...\``;
+                clientMsg = `✅ *Payment Released via Transak*\nFunds sent to Off-Ramp for INR conversion.\nRef: \`${result.hash?.substring(0, 10)}...\`\n\nThe freelancer will receive the fiat amount shortly.`;
+                freelancerMsg = `✅ *Payment Released!*\nClient has released the funds to *Transak Off-Ramp*.\nYour INR transfer is being processed.\nRef: \`${result.hash?.substring(0, 10)}...\``;
             } else {
-                clientMsg = `✅ **Payment Complete (Crypto)**\nFunds released directly to freelancer's wallet.\nAddress: \`${recipient}\`\n\nTx: \`${result.hash?.substring(0, 10)}...\``;
-                freelancerMsg = `✅ **Payment Received!**\n${releaseAmount} MON has been sent directly to your wallet.\n\nTx: \`${result.hash?.substring(0, 10)}...\``;
+                clientMsg = `✅ *Payment Complete (Crypto)*\nFunds released directly to freelancer's wallet.\nAddress: \`${recipient}\`\n\nTx: \`${result.hash?.substring(0, 10)}...\``;
+                freelancerMsg = `✅ *Payment Received!*\n${releaseAmount} MON has been sent directly to your wallet.\n\nTx: \`${result.hash?.substring(0, 10)}...\``;
             }
 
             // Milestone Updates
@@ -1299,11 +1322,14 @@ bot.action('reset_session', (ctx) => {
     // Default reply for reset
     ctx.editMessageText(
         "🔄 Session Reset.\n\n" +
-        "Are you looking to **HIRE** or **WORK**?",
-        Markup.inlineKeyboard([
-            [Markup.button.callback('👨‍💼 I am a Client (Hire)', 'role_client')],
-            [Markup.button.callback('👨‍💻 I am a Freelancer (Work)', 'role_freelancer')]
-        ])
+        "Are you looking to *HIRE* or *WORK*?",
+        {
+            parse_mode: 'Markdown',
+            ...Markup.inlineKeyboard([
+                [Markup.button.callback('👨‍💼 I am a Client (Hire)', 'role_client')],
+                [Markup.button.callback('👨‍💻 I am a Freelancer (Work)', 'role_freelancer')]
+            ])
+        }
     );
     ctx.answerCbQuery();
 });
@@ -1316,9 +1342,10 @@ bot.action('role_client', (ctx) => {
     chatStates[chatId] = { step: STEPS.CAPTURE, project: {}, client: ctx.from.id, freelancer: null, missingField: null, history: [], role: 'client', username: username };
 
     ctx.editMessageText(
-        "👨‍💼 **Client Mode Activated**\n\n" +
+        "👨‍💼 *Client Mode Activated*\n\n" +
         "I'm your Escrow Agent. I will help secure your transaction.\n\n" +
-        "Please describe your project (Scope, Budget, Deadline):"
+        "Please describe your project (Scope, Budget, Deadline):",
+        { parse_mode: 'Markdown' }
     );
     ctx.answerCbQuery();
 });
@@ -1332,11 +1359,12 @@ bot.action('role_freelancer', (ctx) => {
     chatStates[chatId] = { step: STEPS.IDLE, project: {}, client: null, freelancer: ctx.from.id, missingField: null, history: [] };
 
     ctx.editMessageText(
-        "👨‍💻 **Freelancer Mode Activated**\n\n" +
+        "👨‍💻 *Freelancer Mode Activated*\n\n" +
         "Create a profile? Not yet. Just wait!\n\n" +
         "1. Share your username (@" + username + ") with a client.\n" +
         "2. Wait for them to send you an invitation via this bot.\n" +
-        "3. You will receive a notification here to accept the project."
+        "3. You will receive a notification here to accept the project.",
+        { parse_mode: 'Markdown' }
     );
     ctx.answerCbQuery();
 });
@@ -1356,7 +1384,7 @@ bot.action('main_menu_call', (ctx) => {
     const state = chatStates[chatId];
     const targetId = state.role === 'client' ? state.freelancer : state.client;
 
-    bot.telegram.sendMessage(targetId, `📞 **Incoming Call Request**\n\n@${state.username} is requesting a call.`);
+    bot.telegram.sendMessage(targetId, `📞 *Incoming Call Request*\n\n@${state.username} is requesting a call.`, { parse_mode: 'Markdown' });
     ctx.reply("✅ Call Request Sent!");
     ctx.answerCbQuery();
 });
@@ -1366,7 +1394,7 @@ bot.action('main_menu_video', (ctx) => {
     const state = chatStates[chatId];
     const targetId = state.role === 'client' ? state.freelancer : state.client;
 
-    bot.telegram.sendMessage(targetId, `📹 **Video Call Request**\n\n@${state.username} wants to schedule a video call.`);
+    bot.telegram.sendMessage(targetId, `📹 *Video Call Request*\n\n@${state.username} wants to schedule a video call.`, { parse_mode: 'Markdown' });
     ctx.reply("✅ Video Call Request Sent!");
     ctx.answerCbQuery();
 });
@@ -1380,14 +1408,59 @@ bot.action('main_menu_status', (ctx) => {
     msg += `💰 Budget: ₹${state.project.budget}\n`;
 
     if (state.project.milestones) {
-        msg += `\n**Milestones:**\n`;
+        msg += `\n*Milestones:*\n`;
         state.project.milestones.forEach((m, i) => {
             msg += `${i + 1}. ${m.description} - ${m.amount} (${m.status === 'paid' ? '✅ Paid' : '⏳ Pending'})\n`;
         });
     }
 
-    ctx.reply(msg);
+    ctx.reply(msg, { parse_mode: 'Markdown' });
     ctx.answerCbQuery();
+});
+
+bot.action('main_menu_download_contract', async (ctx) => {
+    const chatId = ctx.chat.id;
+    const state = chatStates[chatId];
+
+    if (!state.project || !state.client) {
+        return ctx.answerCbQuery("No active contract found.");
+    }
+
+    ctx.reply("📜 Generating contract PDF... Please wait.");
+    ctx.answerCbQuery();
+
+    try {
+        const parties = {
+            clientId: state.client,
+            clientUsername: state.clientUsername || state.usernameMap?.[state.client] || 'Client',
+            freelancerId: state.freelancer,
+            freelancerUsername: state.freelancerUsername || state.username
+        };
+
+        const blockchain = {
+            escrowId: state.escrowId,
+            contractAddress: process.env.CONTRACT_ADDRESS,
+            agreementHash: state.agreementHash,
+            // Try to find funding tx hash from timeline logs or just leave generic if not easily available
+            // In a real app we'd query the events or store txHash in state.
+            // For now, we'll check if we have it in state
+            txHash: state.fundingTxHash
+        };
+
+        const pdfBuffer = await generateContractPDF(state.project, parties, blockchain);
+
+        await ctx.replyWithDocument({
+            source: pdfBuffer,
+            filename: `Contract_${state.projectId}.pdf`
+        }, {
+            caption: "📜 **Here is your Smart Contract Agreement**\n\nVerified on Monad Testnet.",
+            parse_mode: 'Markdown'
+        });
+
+    } catch (e) {
+        console.error("PDF Generation Error:", e);
+        ctx.reply("❌ Failed to generate contract PDF.");
+    }
 });
 
 bot.action('main_menu_ai_summary', async (ctx) => {
@@ -1400,7 +1473,7 @@ bot.action('main_menu_ai_summary', async (ctx) => {
     // Generate Summary
     const summary = await generateProjectSummary(state.project, state.project.conversation);
 
-    ctx.reply(`🤖 **AI Project Summary**\n\n${summary}`);
+    ctx.reply(`🤖 *AI Project Summary*\n\n${summary}`, { parse_mode: 'Markdown' });
 });
 
 bot.action('main_menu_edit_milestones', (ctx) => {
@@ -1412,11 +1485,12 @@ bot.action('main_menu_edit_milestones', (ctx) => {
     state.newMilestones = [];
 
     ctx.reply(
-        "✏️ **Edit Milestones**\n\n" +
+        "✏️ *Edit Milestones*\n\n" +
         "You are redefining the milestones. The TOTAL budget must remain the same.\n" +
         `Target Total: ${state.project.budget}\n\n` +
         "Please enter the first milestone:\n`Description - Amount`\n\n" +
-        "Type /cancel to stop editing."
+        "Type /cancel to stop editing.",
+        { parse_mode: 'Markdown' }
     );
     ctx.answerCbQuery();
 });
@@ -1429,7 +1503,7 @@ bot.action('send_milestones_approval', (ctx) => {
 
     // Notify Freelancer
     if (state.freelancer) {
-        let msg = "⚠️ **Client Proposed Milestone Changes**\n\nPlease review the new structure:\n\n";
+        let msg = "⚠️ *Client Proposed Milestone Changes*\n\nPlease review the new structure:\n\n";
         state.newMilestones.forEach((m, i) => {
             msg += `${i + 1}. ${m.description}: ${m.amount}\n`;
         });
@@ -1441,10 +1515,13 @@ bot.action('send_milestones_approval', (ctx) => {
             chatStates[state.freelancer].proposedMilestones = state.newMilestones;
         }
 
-        bot.telegram.sendMessage(state.freelancer, msg, Markup.inlineKeyboard([
-            [Markup.button.callback('✅ Approve Changes', 'approve_milestones_edit')],
-            [Markup.button.callback('❌ Reject Changes', 'reject_milestones_edit')]
-        ]));
+        bot.telegram.sendMessage(state.freelancer, msg, {
+            parse_mode: 'Markdown',
+            ...Markup.inlineKeyboard([
+                [Markup.button.callback('✅ Approve Changes', 'approve_milestones_edit')],
+                [Markup.button.callback('❌ Reject Changes', 'reject_milestones_edit')]
+            ])
+        });
     }
 
     ctx.editMessageText("⏳ Sent to freelancer for approval.");
@@ -1507,13 +1584,16 @@ bot.action('main_menu_submit', (ctx) => {
     state.submissionParts = [];
 
     ctx.reply(
-        "📝 **Submission Started**\n\n" +
+        "📝 *Submission Started*\n\n" +
         "Please upload your work files (Documents, Photos, Zip) and type a description.\n" +
         "You can send multiple messages.\n\n" +
-        "Click **Submit Final Work** when you are done.",
-        Markup.inlineKeyboard([
-            [Markup.button.callback('✅ Submit Final Work', 'submit_final_work')]
-        ])
+        "Click *Submit Final Work* when you are done.",
+        {
+            parse_mode: 'Markdown',
+            ...Markup.inlineKeyboard([
+                [Markup.button.callback('✅ Submit Final Work', 'submit_final_work')]
+            ])
+        }
     );
     ctx.answerCbQuery();
 });
