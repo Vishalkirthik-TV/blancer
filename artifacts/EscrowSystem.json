@@ -250,6 +250,11 @@
           "internalType": "uint256",
           "name": "_escrowId",
           "type": "uint256"
+        },
+        {
+          "internalType": "address payable",
+          "name": "_recipient",
+          "type": "address"
         }
       ],
       "name": "releaseFunds",
@@ -258,5 +263,5 @@
       "type": "function"
     }
   ],
-  "address": "0xD381F64520E2E0dBC3A569e11dB29303621410a3"
+  "address": "0x0447d5C2273173510463Bb6add364070D13903e4"
 }

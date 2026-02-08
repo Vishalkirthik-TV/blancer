@@ -31,7 +31,7 @@ console.log("=============================");
 // Contract ABI (simplified interface)
 const ESCROW_ABI = [
     "function createEscrow(address _freelancer, string memory _description, bytes32 _agreementHash) external payable returns (uint256)",
-    "function releaseFunds(uint256 _escrowId) external",
+    "function releaseFunds(uint256 _escrowId, address payable _recipient) external",
     "function raiseDispute(uint256 _escrowId) external",
     "function refundClient(uint256 _escrowId) external",
     "function escrows(uint256) external view returns (address client, address freelancer, uint256 amount, uint8 state, string memory description, bytes32 agreementHash)",
@@ -52,6 +52,7 @@ function initBlockchain() {
             chainId: CHAIN_ID,
             name: "monad-testnet"
         });
+        provider.pollingInterval = 10000; // Slow down polling to avoid rate limits (25 req/sec limit)
         wallet = new ethers.Wallet(PRIVATE_KEY, provider);
         contract = new ethers.Contract(CONTRACT_ADDRESS, ESCROW_ABI, wallet);
         console.log("🔗 Blockchain connection initialized");
@@ -168,12 +169,13 @@ async function fundEscrow(amount, freelancerAddress, projectData = {}, clientId 
 }
 
 /**
- * Release funds to freelancer
+ * Release funds to freelancer or specific recipient
  * @param {number|string} escrowId - The escrow ID on the contract
+ * @param {string} recipientAddress - The address to release funds to (freelancer wallet or off-ramp)
  */
-async function releaseFunds(escrowId) {
+async function releaseFunds(escrowId, recipientAddress) {
     if (MOCK_MODE) {
-        console.log(`[MOCK] Releasing funds for escrow ID: ${escrowId}`);
+        console.log(`[MOCK] Releasing funds for escrow ID: ${escrowId} to ${recipientAddress}`);
         return {
             success: true,
             hash: "0x" + crypto.randomBytes(32).toString('hex'),
@@ -184,9 +186,13 @@ async function releaseFunds(escrowId) {
     try {
         initBlockchain();
 
-        console.log(`💸 Releasing funds for escrow #${escrowId}...`);
+        if (!ethers.isAddress(recipientAddress)) {
+            throw new Error("Invalid recipient address");
+        }
 
-        const tx = await contract.releaseFunds(escrowId);
+        console.log(`💸 Releasing funds for escrow #${escrowId} to ${recipientAddress}...`);
+
+        const tx = await contract.releaseFunds(escrowId, recipientAddress);
         console.log(`⏳ Transaction sent: ${tx.hash}`);
 
         const receipt = await tx.wait();

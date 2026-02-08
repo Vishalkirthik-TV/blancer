@@ -67,15 +67,16 @@ contract EscrowSystem {
         return escrowCounter;
     }
 
-    function releaseFunds(uint256 _escrowId) external {
+    function releaseFunds(uint256 _escrowId, address payable _recipient) external {
         Escrow storage escrow = escrows[_escrowId];
         require(msg.sender == escrow.client, "Only client can release funds");
         require(escrow.state == State.Funded, "Escrow not in funded state");
+        require(_recipient != address(0), "Invalid recipient address");
 
         escrow.state = State.Released;
-        payable(escrow.freelancer).transfer(escrow.amount);
+        _recipient.transfer(escrow.amount);
 
-        emit FundsReleased(_escrowId, escrow.freelancer, escrow.amount);
+        emit FundsReleased(_escrowId, _recipient, escrow.amount);
     }
 
     function raiseDispute(uint256 _escrowId) external {

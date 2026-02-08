@@ -1,30 +1,34 @@
 {
   "chatStates": {
     "1644556303": {
-      "step": "WORKING",
+      "step": "WAITING_PAYOUT_ADDRESS",
       "client": 6732245065,
       "clientUsername": "sarangkdkr",
       "freelancer": 1644556303,
       "freelancerUsername": "Vishalkirthik",
       "project": {
-        "scope": "design",
-        "budget": 20,
+        "scope": "Build a UI",
+        "budget": 5,
         "currency": "INR",
-        "timeline_days": 2,
+        "timeline_days": 3,
         "additional_info": "None",
         "paymentType": "onetime"
       },
-      "projectId": 1770545283457,
+      "projectId": 1770550294198,
       "role": "freelancer",
-      "escrowId": "5"
+      "escrowId": "3",
+      "submissionParts": [],
+      "pendingReleaseAmount": 5,
+      "payoutMethod": "crypto",
+      "payoutAddress": "0x8B021c6Eaa35d6F5103197119edba01F4De6507b"
     },
     "6732245065": {
-      "step": "WORKING",
+      "step": "CONFIRM_RELEASE",
       "project": {
-        "scope": "design",
-        "budget": 20,
+        "scope": "Build a UI",
+        "budget": 5,
         "currency": "INR",
-        "timeline_days": 2,
+        "timeline_days": 3,
         "additional_info": "None",
         "paymentType": "onetime"
       },
@@ -34,71 +38,29 @@
       "history": null,
       "role": "client",
       "username": "sarangkdkr",
-      "tempProjectId": 1770545273662,
-      "projectId": 1770545283457,
+      "tempProjectId": 1770550286269,
+      "projectId": 1770550294198,
       "freelancerUsername": "Vishalkirthik",
       "paymentMethod": "upi",
-      "transakOrderId": "ESC_1770545283457_1770545291021",
-      "escrowId": "5",
-      "agreementHash": "0xa8b0d22997ba9ab6d75acfd54836529b1fd136441fb1e214d1c1256e48129bbf",
-      "paymentVerified": true
+      "transakOrderId": "ESC_1770550294198_1770550302616",
+      "escrowId": "3",
+      "agreementHash": "0x13112c4f549145f375d232168a726db379a964dbbafa8fd7ad0887761f367b12",
+      "paymentVerified": true,
+      "submissionParts": [],
+      "pendingReleaseAmount": 5
     }
   },
   "projectStore": {
-    "1770545283457": {
+    "1770550294198": {
       "clientId": 6732245065,
       "clientChatId": 6732245065,
       "project": {
-        "scope": "design",
-        "budget": 20,
+        "scope": "Build a UI",
+        "budget": 5,
         "currency": "INR",
-        "timeline_days": 2,
+        "timeline_days": 3,
         "additional_info": "None",
-        "paymentType": "onetime",
-        "conversation": [
-          {
-            "role": "client",
-            "username": "sarangkdkr",
-            "text": "hii",
-            "timestamp": "2026-02-08T10:16:13.504Z"
-          },
-          {
-            "role": "client",
-            "username": "sarangkdkr",
-            "text": "hi namaste",
-            "timestamp": "2026-02-08T10:19:31.501Z"
-          },
-          {
-            "role": "freelancer",
-            "username": "Vishalkirthik",
-            "text": "Hello from test script (Freelancer attempt 2)",
-            "timestamp": "2026-02-08T10:24:24.443Z"
-          },
-          {
-            "role": "freelancer",
-            "username": "Vishalkirthik",
-            "text": "hii there from freelancer",
-            "timestamp": "2026-02-08T10:25:14.930Z"
-          },
-          {
-            "role": "client",
-            "username": "sarangkdkr",
-            "text": "hello from client",
-            "timestamp": "2026-02-08T10:25:21.328Z"
-          },
-          {
-            "role": "freelancer",
-            "username": "Vishalkirthik",
-            "text": "hii",
-            "timestamp": "2026-02-08T10:25:42.466Z"
-          },
-          {
-            "role": "client",
-            "username": "sarangkdkr",
-            "text": "hii",
-            "timestamp": "2026-02-08T10:25:55.270Z"
-          }
-        ]
+        "paymentType": "onetime"
       },
       "status": "accepted",
       "freelancerId": 1644556303
