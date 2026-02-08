@@ -1,0 +1,111 @@
+{
+  "chatStates": {
+    "1644556303": {
+      "step": "WORKING",
+      "client": 6732245065,
+      "clientUsername": "sarangkdkr",
+      "freelancer": 1644556303,
+      "freelancerUsername": "Vishalkirthik",
+      "project": {
+        "scope": "design",
+        "budget": 20,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime"
+      },
+      "projectId": 1770545283457,
+      "role": "freelancer",
+      "escrowId": "5"
+    },
+    "6732245065": {
+      "step": "WORKING",
+      "project": {
+        "scope": "design",
+        "budget": 20,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime"
+      },
+      "client": 6732245065,
+      "freelancer": 1644556303,
+      "missingField": null,
+      "history": null,
+      "role": "client",
+      "username": "sarangkdkr",
+      "tempProjectId": 1770545273662,
+      "projectId": 1770545283457,
+      "freelancerUsername": "Vishalkirthik",
+      "paymentMethod": "upi",
+      "transakOrderId": "ESC_1770545283457_1770545291021",
+      "escrowId": "5",
+      "agreementHash": "0xa8b0d22997ba9ab6d75acfd54836529b1fd136441fb1e214d1c1256e48129bbf",
+      "paymentVerified": true
+    }
+  },
+  "projectStore": {
+    "1770545283457": {
+      "clientId": 6732245065,
+      "clientChatId": 6732245065,
+      "project": {
+        "scope": "design",
+        "budget": 20,
+        "currency": "INR",
+        "timeline_days": 2,
+        "additional_info": "None",
+        "paymentType": "onetime",
+        "conversation": [
+          {
+            "role": "client",
+            "username": "sarangkdkr",
+            "text": "hii",
+            "timestamp": "2026-02-08T10:16:13.504Z"
+          },
+          {
+            "role": "client",
+            "username": "sarangkdkr",
+            "text": "hi namaste",
+            "timestamp": "2026-02-08T10:19:31.501Z"
+          },
+          {
+            "role": "freelancer",
+            "username": "Vishalkirthik",
+            "text": "Hello from test script (Freelancer attempt 2)",
+            "timestamp": "2026-02-08T10:24:24.443Z"
+          },
+          {
+            "role": "freelancer",
+            "username": "Vishalkirthik",
+            "text": "hii there from freelancer",
+            "timestamp": "2026-02-08T10:25:14.930Z"
+          },
+          {
+            "role": "client",
+            "username": "sarangkdkr",
+            "text": "hello from client",
+            "timestamp": "2026-02-08T10:25:21.328Z"
+          },
+          {
+            "role": "freelancer",
+            "username": "Vishalkirthik",
+            "text": "hii",
+            "timestamp": "2026-02-08T10:25:42.466Z"
+          },
+          {
+            "role": "client",
+            "username": "sarangkdkr",
+            "text": "hii",
+            "timestamp": "2026-02-08T10:25:55.270Z"
+          }
+        ]
+      },
+      "status": "accepted",
+      "freelancerId": 1644556303
+    }
+  },
+  "usernameMap": {
+    "vishalkirthik": 1644556303,
+    "sarangkdkr": 6732245065
+  }
+}
