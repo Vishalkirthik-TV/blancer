@@ -34,6 +34,8 @@ Powered by **Gemini AI** for intelligent project scoping and **Transak** for sea
 
 ---
 
+<img width="565" height="598" alt="image" src="https://github.com/user-attachments/assets/cd0de551-db5f-43d1-a2c7-60c386997b0c" />
+
 ## 🛠️ Tech Stack
 -   **Bot Framework**: `Telegraf` (Node.js)
 -   **Blockchain**: `Monad Testnet`, `Ethers.js`
